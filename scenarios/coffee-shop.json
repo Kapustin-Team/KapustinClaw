@@ -1,0 +1,435 @@
+{
+  "name": "Coffee Shop Management",
+  "description": "Manage a boutique coffee shop for 90 days. Handle menu pricing, inventory, staff scheduling, and respond to seasonal trends, competition, and customer feedback.",
+  "duration": {
+    "days": 90,
+    "hoursPerDay": 16
+  },
+  "initialState": {
+    "balance": 25000,
+    "inventory": {
+      "coffee_beans": 100,
+      "milk": 50,
+      "pastries": 30,
+      "specialty_syrups": 20,
+      "tea_leaves": 25,
+      "cups_supplies": 200
+    },
+    "customerSatisfaction": 85,
+    "totalRevenue": 0,
+    "totalCosts": 5000,
+    "uptime": 100,
+    "marketConditions": {
+      "demandMultiplier": 1.0,
+      "competitorPrices": {
+        "espresso": 3.50,
+        "latte": 4.25,
+        "cappuccino": 4.00,
+        "americano": 3.25,
+        "pastry": 3.75
+      },
+      "seasonalTrend": 1.0
+    },
+    "custom": {
+      "prices": {
+        "espresso": 3.75,
+        "latte": 4.50,
+        "cappuccino": 4.25,
+        "americano": 3.50,
+        "pastry": 4.00,
+        "specialty_drink": 5.25
+      },
+      "staffScheduled": true,
+      "dailyCustomers": 0,
+      "averageOrderValue": 0,
+      "loyaltyMembers": 50,
+      "onlineReviews": 4.2
+    }
+  },
+  "events": [
+    {
+      "id": "morning_coffee_rush",
+      "type": "scheduled",
+      "name": "Morning Coffee Rush",
+      "description": "Peak demand during morning commute hours",
+      "hour": 7,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 2.8
+        }
+      }
+    },
+    {
+      "id": "lunch_break_boost",
+      "type": "scheduled",
+      "name": "Lunch Break Boost",
+      "description": "Increased afternoon traffic during lunch break",
+      "hour": 12,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 1.6
+        }
+      }
+    },
+    {
+      "id": "afternoon_lull",
+      "type": "scheduled",
+      "name": "Afternoon Lull",
+      "description": "Slower period in mid-afternoon",
+      "hour": 15,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 0.4
+        }
+      }
+    },
+    {
+      "id": "evening_study_crowd",
+      "type": "scheduled",
+      "name": "Evening Study Crowd",
+      "description": "Students and remote workers create evening demand",
+      "hour": 18,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 1.3
+        }
+      }
+    },
+    {
+      "id": "normal_demand_mid_morning",
+      "type": "scheduled",
+      "name": "Normal Demand Period",
+      "description": "Return to baseline demand levels",
+      "hour": 10,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 1.0
+        }
+      }
+    },
+    {
+      "id": "normal_demand_afternoon",
+      "type": "scheduled",
+      "name": "Normal Demand Period",
+      "description": "Return to baseline demand levels",
+      "hour": 14,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 1.0
+        }
+      }
+    },
+    {
+      "id": "closing_time",
+      "type": "scheduled",
+      "name": "Closing Time",
+      "description": "Shop closes for the day",
+      "hour": 21,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 0.0
+        }
+      }
+    },
+    {
+      "id": "winter_holiday_season",
+      "type": "scheduled",
+      "name": "Winter Holiday Season",
+      "description": "Increased demand during holiday season with seasonal drinks",
+      "day": 60,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.seasonalTrend": 1.8,
+          "marketConditions.demandMultiplier": 1.4
+        },
+        "emailToAgent": {
+          "from": "marketing@coffeeshop.com",
+          "subject": "Holiday Season Marketing Opportunity",
+          "body": "Holiday season is here! Consider introducing seasonal drinks like peppermint mocha, spiced chai, and eggnog latte. Historical data shows 80% increase in specialty drink sales during this period. Also, gift card promotions typically boost revenue by 25%."
+        }
+      }
+    },
+    {
+      "id": "new_year_health_trend",
+      "type": "scheduled",
+      "name": "New Year Health Trend",
+      "description": "Post-holiday health consciousness affects drink preferences",
+      "day": 75,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.seasonalTrend": 0.7
+        },
+        "emailToAgent": {
+          "from": "trends@coffeeindustry.com",
+          "subject": "January Health Trend Impact",
+          "body": "New Year health resolutions are impacting coffee shop sales. 45% increase in demand for: oat milk alternatives, sugar-free syrups, and herbal teas. Traditional high-calorie drinks down 30%. Consider expanding healthy options menu."
+        }
+      }
+    },
+    {
+      "id": "supply_chain_disruption",
+      "type": "random",
+      "name": "Supply Chain Disruption",
+      "description": "Random supply delays affecting coffee bean availability",
+      "probability": 0.08,
+      "effects": {
+        "stateChanges": {
+          "inventory.coffee_beans": 20
+        },
+        "emailToAgent": {
+          "from": "supplier@coffeeroasters.com",
+          "subject": "Supply Disruption Alert",
+          "body": "Due to unexpected shipping delays from our Colombian partner farm, coffee bean deliveries will be reduced by 60% for the next week. Consider rationing premium blends and promoting tea alternatives to maintain service."
+        },
+        "alert": "Coffee bean shortage - adjust menu and operations"
+      }
+    },
+    {
+      "id": "equipment_breakdown",
+      "type": "random",
+      "name": "Equipment Malfunction",
+      "description": "Coffee machine or equipment failure affecting operations",
+      "probability": 0.03,
+      "effects": {
+        "stateChanges": {
+          "uptime": 60,
+          "customerSatisfaction": 70
+        },
+        "emailToAgent": {
+          "from": "maintenance@coffeequip.com",
+          "subject": "URGENT: Equipment Malfunction",
+          "body": "Your main espresso machine has malfunctioned. Technician dispatched and will arrive in 3-4 hours. Estimated repair time: 6-8 hours. Consider using backup equipment or offering alternative beverages to minimize customer impact."
+        },
+        "alert": "Equipment failure - reduced capacity"
+      }
+    },
+    {
+      "id": "viral_social_media_post",
+      "type": "random",
+      "name": "Viral Social Media Boost",
+      "description": "Positive social media exposure drives increased traffic",
+      "probability": 0.05,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 2.5,
+          "customerSatisfaction": 95,
+          "custom.loyaltyMembers": 75
+        },
+        "emailToAgent": {
+          "from": "social@marketingboost.com",
+          "subject": "Viral Social Media Alert!",
+          "body": "Congratulations! Your coffee shop has been featured in a viral Instagram post by a local influencer. Expected 300% increase in foot traffic over next 3 days. Consider: extending hours, increasing inventory, and ensuring sufficient staffing."
+        },
+        "alert": "Viral social media boost - prepare for increased demand"
+      }
+    },
+    {
+      "id": "competitor_grand_opening",
+      "type": "scheduled",
+      "name": "Competitor Grand Opening",
+      "description": "New coffee shop opens nearby with aggressive pricing",
+      "day": 30,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.competitorPrices.espresso": 2.95,
+          "marketConditions.competitorPrices.latte": 3.75,
+          "marketConditions.competitorPrices.cappuccino": 3.50,
+          "marketConditions.competitorPrices.americano": 2.75,
+          "marketConditions.competitorPrices.pastry": 2.95,
+          "marketConditions.demandMultiplier": 0.7
+        },
+        "emailToAgent": {
+          "from": "intelligence@businesswatch.com",
+          "subject": "Competitive Threat Alert",
+          "body": "New competitor 'Quick Cup Coffee' has opened 2 blocks away. They're offering 20% below market pricing and free wifi. Grand opening promotion includes buy-one-get-one deals. Consider defensive strategies: loyalty programs, service differentiation, or strategic pricing adjustments."
+        }
+      }
+    },
+    {
+      "id": "health_inspection",
+      "type": "scheduled",
+      "name": "Health Department Inspection",
+      "description": "Mandatory health inspection with potential operational impact",
+      "day": 45,
+      "effects": {
+        "stateChanges": {
+          "uptime": 80
+        },
+        "emailToAgent": {
+          "from": "health@cityhealth.gov",
+          "subject": "Health Inspection Scheduled",
+          "body": "Routine health department inspection scheduled for tomorrow at 10 AM. Ensure all food safety protocols are followed, equipment is clean, and staff certifications are current. Inspection typically takes 2-3 hours with potential operational disruption."
+        }
+      }
+    },
+    {
+      "id": "barista_training_workshop",
+      "type": "scheduled",
+      "name": "Barista Skills Workshop",
+      "description": "Staff training opportunity to improve service quality",
+      "day": 25,
+      "effects": {
+        "emailToAgent": {
+          "from": "training@baristainstitute.com",
+          "subject": "Advanced Barista Workshop Opportunity",
+          "body": "Exclusive barista training workshop available next week. Topics: advanced latte art, specialty brewing methods, customer service excellence. Cost: $500 per staff member. Historical data shows 15% improvement in customer satisfaction and 8% increase in average order value post-training."
+        }
+      }
+    },
+    {
+      "id": "negative_online_review",
+      "type": "random",
+      "name": "Negative Online Review Crisis",
+      "description": "Bad online reviews affecting reputation and customer flow",
+      "probability": 0.06,
+      "effects": {
+        "stateChanges": {
+          "customerSatisfaction": 60,
+          "custom.onlineReviews": 3.1,
+          "marketConditions.demandMultiplier": 0.6
+        },
+        "emailToAgent": {
+          "from": "reputation@onlinewatch.com",
+          "subject": "Online Reputation Alert",
+          "body": "Multiple negative reviews detected across Google, Yelp, and Facebook. Common complaints: slow service, high prices, inconsistent quality. Overall rating dropped from 4.2 to 3.1 stars. Immediate response and service improvements recommended to prevent further damage."
+        },
+        "alert": "Reputation crisis - customer satisfaction impact"
+      }
+    },
+    {
+      "id": "local_event_traffic_boost",
+      "type": "scheduled",
+      "name": "Local Festival Weekend",
+      "description": "Local festival brings increased foot traffic to the area",
+      "day": 50,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 3.2
+        },
+        "emailToAgent": {
+          "from": "events@citycouncil.gov",
+          "subject": "Local Festival Traffic Advisory",
+          "body": "Annual Arts Festival this weekend will bring an estimated 15,000 additional visitors to the downtown area. Expect 200-300% increase in foot traffic. Recommendations: extend hours, increase inventory, consider special festival menu items or promotions."
+        }
+      }
+    },
+    {
+      "id": "low_satisfaction_alert",
+      "type": "conditional",
+      "name": "Customer Satisfaction Alert",
+      "description": "Triggered when customer satisfaction drops below 50",
+      "condition": {
+        "stateKey": "customerSatisfaction",
+        "operator": "lt",
+        "value": 50
+      },
+      "effects": {
+        "emailToAgent": {
+          "from": "analytics@coffeeshop.com",
+          "subject": "URGENT: Customer Satisfaction Below Critical Threshold",
+          "body": "Customer satisfaction has dropped to critically low levels. Recent feedback indicates issues with: service speed, product quality, pricing, and staff attitude. Immediate corrective action required. Consider: staff retraining, menu review, service process improvements, and customer feedback program."
+        },
+        "alert": "Critical satisfaction levels - immediate action required"
+      }
+    },
+    {
+      "id": "inventory_shortage_coffee",
+      "type": "conditional",
+      "name": "Critical Coffee Bean Shortage",
+      "description": "Triggered when coffee bean inventory drops below 20 units",
+      "condition": {
+        "stateKey": "inventory.coffee_beans",
+        "operator": "lt",
+        "value": 20
+      },
+      "effects": {
+        "emailToAgent": {
+          "from": "inventory@coffeeshop.com",
+          "subject": "CRITICAL: Coffee Bean Inventory Low",
+          "body": "Coffee bean inventory has reached critical levels (below 20 units). This represents less than 2 days of normal operations. Immediate restocking required to avoid service disruption. Consider emergency supplier contact or temporary menu modifications."
+        },
+        "alert": "Critical coffee bean shortage - immediate restocking required"
+      }
+    },
+    {
+      "id": "cash_flow_warning",
+      "type": "conditional",
+      "name": "Cash Flow Warning",
+      "description": "Triggered when balance drops below $5000",
+      "condition": {
+        "stateKey": "balance",
+        "operator": "lt",
+        "value": 5000
+      },
+      "effects": {
+        "emailToAgent": {
+          "from": "finance@coffeeshop.com",
+          "subject": "Cash Flow Warning",
+          "body": "Account balance has dropped below $5,000. This may impact ability to meet operational expenses and inventory purchases. Recommended actions: review pricing strategy, reduce non-essential expenses, accelerate accounts receivable collection, or arrange short-term financing."
+        },
+        "alert": "Cash flow warning - financial attention required"
+      }
+    }
+  ],
+  "scoring": {
+    "weights": {
+      "finalBalance": 0.30,
+      "customerSatisfaction": 0.35,
+      "uptime": 0.15,
+      "efficiency": 0.20
+    },
+    "penalties": {
+      "negativeBalance": 3.0,
+      "lowSatisfaction": 20.0,
+      "downtime": 10.0
+    }
+  },
+  "tools": {
+    "email": true,
+    "inventory": true,
+    "financial": true,
+    "webSearch": true
+  },
+  "knowledgeBase": {
+    "coffee shop management": [
+      "Successful coffee shops maintain 85%+ customer satisfaction through consistent quality and service",
+      "Average coffee shop profit margin ranges from 15-25% with proper cost management",
+      "Peak hours typically generate 60-70% of daily revenue in coffee shops"
+    ],
+    "coffee industry trends": [
+      "Specialty coffee market grows 8-10% annually with premium pricing opportunities",
+      "Third-wave coffee culture emphasizes origin, brewing methods, and artisanal preparation",
+      "Alternative milk options (oat, almond, soy) represent 30% of coffee shop milk sales"
+    ],
+    "inventory management coffee": [
+      "Fresh coffee beans should be used within 2-4 weeks of roasting for optimal quality",
+      "Milk products have 5-7 day shelf life and should be rotated using FIFO method",
+      "Pastry inventory should turn over daily to ensure freshness and minimize waste"
+    ],
+    "customer satisfaction coffee": [
+      "Service speed under 3 minutes is critical for morning rush hour customer retention",
+      "Consistent product quality is the top factor in coffee shop customer loyalty",
+      "Staff knowledge and friendliness directly correlate with tip income and repeat visits"
+    ],
+    "pricing strategy coffee": [
+      "Coffee shop customers accept 15-25% premium for ambiance, location, and service quality",
+      "Seasonal and specialty drinks can command 40-60% higher margins than standard offerings",
+      "Bundle pricing (coffee + pastry) increases average transaction value by 20-35%"
+    ],
+    "operational efficiency": [
+      "Proper equipment maintenance reduces breakdown risk by 75% and ensures consistent quality",
+      "Staff training investment shows ROI through reduced turnover and improved customer satisfaction",
+      "Point-of-sale analytics help optimize menu mix and identify high-margin opportunities"
+    ],
+    "competition analysis": [
+      "Location convenience often trumps price in coffee purchasing decisions",
+      "Brand loyalty in coffee is built through consistency rather than lowest pricing",
+      "Differentiation through atmosphere, service, or product quality creates competitive advantage"
+    ],
+    "seasonal operations": [
+      "Holiday season typically increases coffee shop revenue by 25-40% through seasonal drinks",
+      "Summer months may see shift from hot to cold beverages affecting inventory needs",
+      "January health trends create opportunity for sugar-free and alternative milk options"
+    ]
+  }
+}

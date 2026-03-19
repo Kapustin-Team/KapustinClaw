@@ -1,0 +1,351 @@
+{
+  "name": "Vending Machine Management",
+  "description": "Manage a smart vending machine business for 365 days. Handle inventory, pricing, restocking, and respond to market conditions and random events.",
+  "duration": {
+    "days": 365,
+    "hoursPerDay": 24
+  },
+  "initialState": {
+    "balance": 10000,
+    "inventory": {
+      "cola": 50,
+      "water": 30,
+      "chips": 25,
+      "candy": 40,
+      "energy_drink": 15
+    },
+    "customerSatisfaction": 100,
+    "totalRevenue": 0,
+    "totalCosts": 0,
+    "uptime": 100,
+    "marketConditions": {
+      "demandMultiplier": 1.0,
+      "competitorPrices": {
+        "cola": 1.50,
+        "water": 1.00,
+        "chips": 2.00,
+        "candy": 1.25,
+        "energy_drink": 3.00
+      },
+      "weatherImpact": 1.0
+    },
+    "custom": {
+      "prices": {
+        "cola": 1.75,
+        "water": 1.25,
+        "chips": 2.25,
+        "candy": 1.50,
+        "energy_drink": 3.50
+      },
+      "lastRestockDay": 0,
+      "maintenanceScheduled": false
+    }
+  },
+  "events": [
+    {
+      "id": "morning_rush",
+      "type": "scheduled",
+      "name": "Morning Rush Hour",
+      "description": "High demand during morning commute hours",
+      "hour": 8,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 1.8
+        }
+      }
+    },
+    {
+      "id": "evening_rush",
+      "type": "scheduled",
+      "name": "Evening Rush Hour",
+      "description": "High demand during evening commute hours",
+      "hour": 17,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 1.6
+        }
+      }
+    },
+    {
+      "id": "night_low_demand",
+      "type": "scheduled",
+      "name": "Night Low Demand",
+      "description": "Reduced demand during late night hours",
+      "hour": 22,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 0.3
+        }
+      }
+    },
+    {
+      "id": "normal_demand_morning",
+      "type": "scheduled",
+      "name": "Normal Demand - Morning",
+      "description": "Return to normal demand levels",
+      "hour": 10,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 1.0
+        }
+      }
+    },
+    {
+      "id": "normal_demand_evening",
+      "type": "scheduled",
+      "name": "Normal Demand - Evening",
+      "description": "Return to normal demand levels",
+      "hour": 19,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.demandMultiplier": 1.0
+        }
+      }
+    },
+    {
+      "id": "summer_heat_wave",
+      "type": "scheduled",
+      "name": "Summer Heat Wave",
+      "description": "Extreme heat increases demand for cold beverages",
+      "day": 180,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.weatherImpact": 2.5
+        },
+        "emailToAgent": {
+          "from": "weather-service@city.gov",
+          "subject": "Heat Wave Warning",
+          "body": "Extreme heat warning issued for the next 30 days. Temperatures expected to exceed 95°F daily. High demand for cooling beverages anticipated."
+        }
+      }
+    },
+    {
+      "id": "winter_slowdown",
+      "type": "scheduled",
+      "name": "Winter Slowdown",
+      "description": "Cold weather reduces overall vending machine usage",
+      "day": 330,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.weatherImpact": 0.6
+        },
+        "emailToAgent": {
+          "from": "weather-service@city.gov",
+          "subject": "Winter Weather Advisory",
+          "body": "Extended cold period expected. Reduced foot traffic and beverage consumption likely."
+        }
+      }
+    },
+    {
+      "id": "supplier_delay",
+      "type": "random",
+      "name": "Supplier Delivery Delay",
+      "description": "Random supplier delays affecting inventory restocking",
+      "probability": 0.05,
+      "effects": {
+        "emailToAgent": {
+          "from": "logistics@supplier.com",
+          "subject": "Delivery Delay Notice",
+          "body": "Due to unexpected logistics issues, your scheduled delivery will be delayed by 2-3 days. We apologize for the inconvenience and are working to expedite your order."
+        },
+        "alert": "Supplier delay - plan inventory accordingly"
+      }
+    },
+    {
+      "id": "machine_breakdown",
+      "type": "random",
+      "name": "Machine Technical Issue",
+      "description": "Random technical problems affecting machine uptime",
+      "probability": 0.02,
+      "effects": {
+        "stateChanges": {
+          "uptime": 0
+        },
+        "emailToAgent": {
+          "from": "maintenance@vendtech.com",
+          "subject": "URGENT: Machine Fault Detected",
+          "body": "Your vending machine has experienced a technical fault and is currently offline. Our technician will arrive within 4-6 hours for repairs. Estimated downtime: 8-12 hours."
+        },
+        "alert": "CRITICAL: Machine offline - immediate attention required"
+      }
+    },
+    {
+      "id": "competitor_price_war",
+      "type": "scheduled",
+      "name": "Competitor Price War",
+      "description": "Nearby competitor drastically reduces prices",
+      "day": 120,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.competitorPrices.cola": 1.00,
+          "marketConditions.competitorPrices.water": 0.75,
+          "marketConditions.competitorPrices.chips": 1.50,
+          "marketConditions.competitorPrices.candy": 1.00,
+          "marketConditions.competitorPrices.energy_drink": 2.50
+        },
+        "emailToAgent": {
+          "from": "intelligence@vendbiz.com",
+          "subject": "Competitive Intelligence Alert",
+          "body": "Major competitor has launched aggressive pricing strategy. They've reduced prices across all categories by 20-30%. Market share impact expected. Consider strategic response."
+        }
+      }
+    },
+    {
+      "id": "new_product_opportunity",
+      "type": "scheduled",
+      "name": "New Product Launch Opportunity",
+      "description": "Opportunity to stock a trending new product",
+      "day": 200,
+      "effects": {
+        "emailToAgent": {
+          "from": "sales@newproducts.com",
+          "subject": "Exclusive Product Opportunity",
+          "body": "Introducing the hottest new energy drink 'PowerBoost'! Limited time exclusive distribution opportunity in your area. High profit margins (60%) and strong consumer demand. Contact us to place your first order."
+        }
+      }
+    },
+    {
+      "id": "low_inventory_alert",
+      "type": "conditional",
+      "name": "Low Inventory Alert",
+      "description": "Triggered when any product runs below 5 units",
+      "condition": {
+        "stateKey": "inventory.cola",
+        "operator": "lt",
+        "value": 5
+      },
+      "effects": {
+        "emailToAgent": {
+          "from": "system@vendingmachine.com",
+          "subject": "Low Inventory Alert - Cola",
+          "body": "WARNING: Cola inventory has dropped below 5 units. Consider immediate restocking to avoid stockouts and lost revenue."
+        },
+        "alert": "Low inventory warning"
+      }
+    },
+    {
+      "id": "satisfaction_crisis",
+      "type": "conditional",
+      "name": "Customer Satisfaction Crisis",
+      "description": "Triggered when customer satisfaction drops below 30",
+      "condition": {
+        "stateKey": "customerSatisfaction",
+        "operator": "lt",
+        "value": 30
+      },
+      "effects": {
+        "stateChanges": {
+          "customerSatisfaction": 20
+        },
+        "emailToAgent": {
+          "from": "feedback@customerservice.com",
+          "subject": "URGENT: Customer Satisfaction Crisis",
+          "body": "Customer satisfaction has reached critically low levels. Multiple complaints received about: product availability, machine reliability, and pricing. Immediate corrective action required to prevent permanent customer loss."
+        },
+        "alert": "CRISIS: Customer satisfaction critical - immediate action required"
+      }
+    },
+    {
+      "id": "maintenance_reminder",
+      "type": "scheduled",
+      "name": "Quarterly Maintenance Reminder",
+      "description": "Preventive maintenance recommendation",
+      "day": 90,
+      "effects": {
+        "emailToAgent": {
+          "from": "maintenance@vendtech.com",
+          "subject": "Quarterly Maintenance Due",
+          "body": "Your vending machine is due for quarterly preventive maintenance. Regular maintenance reduces breakdown risk by 80% and extends machine lifespan. Schedule service to maintain optimal performance."
+        }
+      }
+    },
+    {
+      "id": "health_trend_impact",
+      "type": "scheduled",
+      "name": "Health Consciousness Trend",
+      "description": "Growing health consciousness affects product demand",
+      "day": 150,
+      "effects": {
+        "stateChanges": {
+          "marketConditions.competitorPrices.water": 1.25,
+          "marketConditions.demandMultiplier": 0.8
+        },
+        "emailToAgent": {
+          "from": "trends@marketresearch.com",
+          "subject": "Market Trend Alert: Health Consciousness",
+          "body": "Consumer behavior study shows 40% increase in health-conscious purchasing decisions. Water and low-calorie options gaining popularity. Traditional snacks and sugary drinks experiencing 15% demand decline."
+        }
+      }
+    },
+    {
+      "id": "cash_flow_crisis",
+      "type": "conditional",
+      "name": "Cash Flow Crisis",
+      "description": "Triggered when balance drops below $1000",
+      "condition": {
+        "stateKey": "balance",
+        "operator": "lt",
+        "value": 1000
+      },
+      "effects": {
+        "emailToAgent": {
+          "from": "accounting@vendbusiness.com",
+          "subject": "URGENT: Cash Flow Alert",
+          "body": "Your account balance has dropped below $1,000. This may impact your ability to restock inventory and maintain operations. Consider: reducing operating costs, optimizing pricing strategy, or securing additional funding."
+        },
+        "alert": "Cash flow crisis - immediate financial attention required"
+      }
+    }
+  ],
+  "scoring": {
+    "weights": {
+      "finalBalance": 0.35,
+      "customerSatisfaction": 0.25,
+      "uptime": 0.20,
+      "efficiency": 0.20
+    },
+    "penalties": {
+      "negativeBalance": 2.0,
+      "lowSatisfaction": 15.0,
+      "downtime": 8.0
+    }
+  },
+  "tools": {
+    "email": true,
+    "inventory": true,
+    "financial": true,
+    "webSearch": true
+  },
+  "knowledgeBase": {
+    "vending machine": [
+      "Modern vending machines typically have 80-95% uptime when properly maintained",
+      "Average profit margin on vending machine products ranges from 30-60%",
+      "Peak usage times are typically 7-9 AM, 12-2 PM, and 5-7 PM"
+    ],
+    "inventory management": [
+      "Just-in-time inventory reduces storage costs but increases stockout risk",
+      "Safety stock should be 20-30% of average weekly consumption",
+      "High-margin items should be prioritized for premium shelf space"
+    ],
+    "pricing strategy": [
+      "Price elasticity for vending machine products is typically low due to convenience factor",
+      "Dynamic pricing based on demand patterns can increase revenue by 15-25%",
+      "Competitor pricing should be monitored but convenience premium of 10-20% is acceptable"
+    ],
+    "customer satisfaction": [
+      "Product availability is the #1 factor in vending machine satisfaction",
+      "Machine reliability and easy payment options are critical satisfaction drivers",
+      "Response time to technical issues should not exceed 6 hours during business days"
+    ],
+    "supplier management": [
+      "Multiple supplier relationships reduce supply chain risk",
+      "Bulk ordering typically provides 5-15% cost savings",
+      "Seasonal demand forecasting improves inventory turnover rates"
+    ],
+    "market trends": [
+      "Health-conscious consumers increasingly prefer water and low-calorie options",
+      "Cashless payment adoption in vending exceeds 70% in urban areas",
+      "Energy drink category shows strongest growth at 8-12% annually"
+    ]
+  }
+}
